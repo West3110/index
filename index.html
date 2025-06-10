@@ -1,12 +1,10 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>奥山結婚式二次会チーム分け</title>
-  
-  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-  
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500&family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
   <style>
     body {
       font-family: 'Quicksand', sans-serif;
@@ -19,16 +17,16 @@
 
     h1 {
       font-family: 'Roboto', sans-serif;
-      color: #fff;
       font-size: 3em;
       margin-top: 30px;
+      color: #fff;
       text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
     }
 
-    label, .instruction {
+    label {
       display: block;
-      margin: 20px 0 10px;
       font-size: 1.2em;
+      margin-top: 20px;
     }
 
     input, button {
@@ -37,6 +35,7 @@
       border-radius: 25px;
       border: 2px solid #ddd;
       outline: none;
+      margin-top: 10px;
       background-color: #444;
       color: #fff;
       transition: all 0.3s ease;
@@ -45,10 +44,6 @@
     input:focus, button:hover {
       border-color: #3498db;
       background-color: #3498db;
-    }
-
-    form {
-      margin-top: 20px;
     }
 
     .team {
@@ -73,26 +68,36 @@
       transition: opacity 0.5s ease-out;
     }
 
+    .error {
+      color: #ff6347;
+    }
+
     @keyframes popIn {
-      0% { transform: scale(0); opacity: 0; }
-      100% { transform: scale(1); opacity: 1; }
+      0% {
+        transform: scale(0);
+        opacity: 0;
+      }
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
     }
   </style>
 </head>
 <body>
 
   <h1>奥山結婚式二次会チーム分け</h1>
-  
+
   <form onsubmit="drawLottery(); return false;">
     <label for="name">あなたの名前を漢字で入力してください：</label>
-    <input type="text" id="name" name="name" placeholder="例：山田太郎">
-    <br><br>
+    <input type="text" id="name" name="name" placeholder="例：山田太郎" />
+    <br /><br />
     <button type="submit">くじを引く</button>
   </form>
 
   <div id="result"></div>
 
-  <script defer>
+  <script>
     const teamMap = {
       "渡辺芽吹": "A", "武田佳記": "A", "梶浦航也": "A", "佐藤貴彰": "A", "三浦翔平": "A",
       "佐藤駿": "B", "森谷一輝": "B", "藤田和樹": "B", "及川瑞加": "B", "小野美奈": "B",
@@ -110,29 +115,37 @@
     function drawLottery() {
       const nameInput = document.getElementById("name");
       const resultDiv = document.getElementById("result");
-      let name = nameInput.value.trim().replace(/\s+/g, '');
+      let name = nameInput.value.trim().replace(/\s+/g, "");
 
       if (name === "") {
-        resultDiv.innerHTML = `<span style="color:#ff6347;">名前を入力してください。</span>`;
+        resultDiv.innerHTML = `<span class="error">名前を入力してください。</span>`;
         return;
       }
 
-      if (teamMap[name]) {
-        let count = 0;
-        const interval = setInterval(() => {
-          const randomTeam = teams[Math.floor(Math.random() * teams.length)];
-          resultDiv.innerHTML = `<h2 class="team">"${randomTeam}"</h2>`;
-          count++;
-          if (count > 20) {
-            clearInterval(interval);
-            setTimeout(() => {
-              resultDiv.innerHTML = `<h2 class="final-team">"${teamMap[name]}"</h2>`;
-            }, 500);
-          }
-        }, 150);
-      } else {
-        resultDiv.innerHTML = `<span style="color:#ff6347;">正しい氏名を入力してください。</span>`;
+      if (!teamMap[name]) {
+        resultDiv.innerHTML = `<span class="error">正しい氏名を入力してください。</span>`;
+        return;
       }
+
+      const targetTeam = teamMap[name];
+      const duration = 3000;
+      const startTime = performance.now();
+
+      function animate(currentTime) {
+        const elapsed = currentTime - startTime;
+
+        // チーム名をランダムに切り替える
+        const randomTeam = teams[Math.floor(Math.random() * teams.length)];
+        resultDiv.innerHTML = `<h2 class="team">"${randomTeam}"</h2>`;
+
+        if (elapsed < duration) {
+          requestAnimationFrame(animate);
+        } else {
+          resultDiv.innerHTML = `<h2 class="final-team">"${targetTeam}"</h2>`;
+        }
+      }
+
+      requestAnimationFrame(animate);
     }
   </script>
 
